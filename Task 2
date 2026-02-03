@@ -1,0 +1,29 @@
+.text
+.globl main
+main:
+    addi a0, x0, 3 # n = 3
+    jal x1, ntri # jump to function and store return adress
+    li a1, 1 # activate print call
+    ecall # prints the value
+    j exit # jumps to exit
+    ntri:
+        addi sp, sp, -8 # allots memory for 2 words in stack
+        sw x1, 4(sp) # pushes the return adress in stack
+        sw a0, 0(sp) # pushes the current value in stack
+        addi t0, x0, 1 # store 1 in temp reg
+        ble a0, t0, L1 # compare if n <= 1 and if true, jumps to Label L1
+        addi a0, a0, -1 # performs n - 1
+        jal x1, ntri # call the function again and overwrite the return adress in x1, but the original adress is saved in stack 
+        lw t1, 0(sp) # pops the current value in stack in temp reg t1
+        add a0, a0, t1 # adds the value to n
+        beq x0, x0, done # jumps to label done to deallocate memory in stack
+    
+    L1:
+        li a0, 1 # stores 1 in a0 when base case is reached
+    
+    done:
+        lw x1, 4(sp) # pops the current adress in stack in x1
+        addi sp, sp, 8 # deallocate memory 
+        jalr x0, 0(x1) # jumps back to the latest return adress in stack
+
+    exit: # THE FINAL RESULT PRINTED SHOULD BE 6 IN TERMINAL
