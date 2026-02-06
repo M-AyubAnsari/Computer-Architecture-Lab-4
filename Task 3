@@ -1,0 +1,86 @@
+.text
+.globl Start
+.globl Bubble
+
+Start:  # Creating an array for testing purposes
+    li x3, 0x100    # Base address of the array
+    li x10, 0x100   # x10 = a
+    li x11, 10      # x11 = Length which is of 10 elements
+
+    li x5, 46
+    sw x5, 0(x3)
+    addi x3, x3, 4
+
+    li x5, 98
+    sw x5, 0(x3)
+    addi x3, x3, 4
+
+    li x5, 54
+    sw x5, 0(x3)
+    addi x3, x3, 4
+
+    li x5, 7
+    sw x5, 0(x3)
+    addi x3, x3, 4
+
+    li x5, 82
+    sw x5, 0(x3)
+    addi x3, x3, 4
+
+    li x5, 69
+    sw x5, 0(x3)
+    addi x3, x3, 4
+
+    li x5, 112
+    sw x5, 0(x3)
+    addi x3, x3, 4
+
+    li x5, 45
+    sw x5, 0(x3)
+    addi x3, x3, 4
+
+    li x5, 39
+    sw x5, 0(x3)
+    addi x3, x3, 4
+
+    li x5, 74
+    sw x5, 0(x3)
+
+    jal x1, Bubble # Jump to label Bubble to commence bubble sort
+
+
+
+Bubble:
+    beq x10, x0, Exit   # a gets stored in the register x10 and if a = 0, then we will jump to exit immediately
+    beq x11, x0, Exit   # Length gets stored int the register x11 and if len = 0, then we will jump to exit immediately
+    addi x12, x0, 0     # The outer loop i gets stored in the register x12 and is assigned the value 0 initially
+
+OuterLoop:
+    bge x12, x11, Exit   # if x12 >= x11 or i >= length, break out of the loop and jump to exit immediately.
+    add x13, x12, x0     # The inner loop j gets stored in the register x13 and is assigned the same value as i initially which is 0.
+
+InnerLoop:
+    bge x13, x11, IncremenetOfI  # if x13 >= x11 or j >= length, we will increment i to repeat the loop until the outer loop termination is triggered
+
+    slli x14, x12, 2    # Using slli to shift left by 2 to multiply i by 4.
+    add x14, x10, x14   # The register x14 holds the address of a[i]
+    lw x15, 0(x14)      # Loads value of a[i] into register x15
+
+    slli x16, x13, 2    # Using slli to shift left by 2 to multiply j by 4
+    add x16, x10, x16   # The register x16 holds the address of a[j]
+    lw x17, 0(x16)      # Loads value of a[j] into register x17
+
+    bge x15, x17, NoSwap # If the value of a[i] >= the value of a[j], then dont swap and jump to the label and increment j else swap the two values. 
+    sw x17, 0(x14)       # a[i] = a[j]
+    sw x15, 0(x16)       # a[j] = old a[i]
+
+NoSwap:
+    addi x13, x13, 1 # Incrementing j by 1
+    j InnerLoop      # Jump to inner loop again
+
+IncremenetOfI:
+    addi x12, x12, 1 # Incrementing i by 1
+    j OuterLoop      # Jump to outer loop again until termination.
+
+Exit:
+    jalr x0, 0(x1)   # Return to caller
