@@ -1,0 +1,31 @@
+.text
+.globl main
+main:
+    addi a0, x0, 5 # base x = 5
+    addi a1, x0, 3 # exponent y = 3
+    jal x1, power # call power function
+    addi a1, a0, 0 # move result to a1 for printing
+    addi a0, x0, 1 # activate print call (syscall 1)
+    ecall # prints the value
+    j exit # jumps to exit
+
+power:
+    bne a1, x0, recurse # check if y != 0, if true go to recurse
+    addi a0, x0, 1 # base case: if y == 0, return 1
+    jalr x0, 0(x1) # return to caller
+
+recurse:
+    addi sp, sp, -8 # allots memory for 2 words in stack
+    sw x1, 4(sp) # pushes the return address in stack
+    sw a0, 0(sp) # pushes the base (x) in stack
+    addi a1, a1, -1 # performs y - 1
+    jal x1, power # recursive call power(x, y-1)
+    
+    lw t1, 0(sp) # pops the base (x) from stack into temp reg t1
+    lw x1, 4(sp) # pops the return address from stack
+    addi sp, sp, 8 # deallocate memory
+    
+    mul a0, a0, t1 # result = power(x, y-1) * x
+    jalr x0, 0(x1) # return to caller
+
+exit: # THE FINAL RESULT PRINTED SHOULD BE 125
